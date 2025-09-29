@@ -13,7 +13,14 @@
     h2 {
       text-align: center;
       color: #33475b;
+      margin-bottom: 10px;
+    }
+    #scoreBoard {
+      text-align: center;
       margin-bottom: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #0091ae;
     }
     .board { 
       display: flex; 
@@ -56,60 +63,51 @@
     .deal:active { cursor: grabbing; }
     .deal:hover { transform: translateY(-2px); background: #ff5c36; }
 
-    #gameOver { 
-      display:none; 
-      background:rgba(0,0,0,0.85); 
-      color:white; 
-      font-size:22px; 
-      position:fixed; 
-      top:0; left:0; 
-      width:100%; height:100%; 
-      align-items:center; 
-      justify-content:center; 
-      flex-direction:column; 
-      z-index: 10;
-    }
-    #gameOver button { 
-      margin-top:15px; 
-      padding:10px 25px; 
-      background:#ff7a59; 
-      color:white; 
-      border:none; 
-      border-radius:6px; 
-      cursor:pointer; 
-      font-size:16px;
-      transition: background 0.2s ease;
-    }
-    #gameOver button:hover { background:#ff5c36; }
-
-    /* ✅ Good job popup */
-    #successMsg {
+    /* Overlays */
+    #moveCelebration, #gameWon, #gameOver {
       display: none;
       position: fixed;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 50;
+    }
+
+    /* ✅ Fix: correct move GIF bottom center */
+    #moveCelebration {
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: #28a745;
+      width: auto; height: auto;
+    }
+
+    #gameWon, #gameOver {
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
       color: white;
-      padding: 12px 25px;
-      border-radius: 8px;
-      font-size: 18px;
-      font-weight: 600;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      animation: fadeInOut 2s ease;
-      z-index: 20;
+      font-size: 24px;
+      text-align: center;
     }
-    @keyframes fadeInOut {
-      0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
-      20% { opacity: 1; transform: translateX(-50%) translateY(0); }
-      80% { opacity: 1; }
-      100% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    #gameWon button, #gameOver button {
+      margin-top: 20px;
+      padding: 10px 25px;
+      border: none;
+      border-radius: 6px;
+      background: #ff7a59;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.2s ease;
     }
+    #gameWon button:hover, #gameOver button:hover { background:#ff5c36; }
   </style>
 </head>
 <body>
 
 <h2>HubSpot Deal Stage Trainer</h2>
+<div id="scoreBoard">Score: 0</div>
+
 <div class="board" id="board">
   <div class="stage" id="Qualified"><h3>Qualified Client</h3></div>
   <div class="stage" id="CCL"><h3>CCL Sent</h3></div>
@@ -120,24 +118,52 @@
   <div class="stage" id="Lost"><h3>Deal Lost</h3></div>
 </div>
 
-<div id="gameOver">
-  <p>❌ Invalid Move – Game Over!</p>
-  <button onclick="location.reload()">Restart</button>
+<!-- Celebration for correct move -->
+<div id="moveCelebration">
+  <img src="https://i.pinimg.com/originals/93/9c/c5/939cc5c66b5cbd1061874f2db44d561d.gif" 
+       alt="Good Job" width="150">
 </div>
 
-<div id="successMsg">✅ Good job!</div>
+<!-- Game Won screen -->
+<div id="gameWon">
+  <p>🎉 Congratulations – You Won!</p>
+  <img src="https://i.pinimg.com/originals/0b/91/fc/0b91fc26dc66e8854c0d1b29315cdc44.gif" 
+       alt="Win" width="300">
+  <button onclick="location.reload()">Play Again</button>
+</div>
+
+<!-- Game Over screen -->
+<div id="gameOver">
+  <p>❌ Invalid Move – Game Over!</p>
+  <img src="https://i.pinimg.com/originals/6a/8f/8b/6a8f8b677fec23b7321b6dcf2be8e62e.gif" 
+       alt="Game Over" width="300">
+  <button onclick="location.reload()">Try Again</button>
+</div>
 
 <script>
+  // Deal movement rules
   const rules = {
-    "Qualified": ["CCL","Postponed","Rollover"],
-    "CCL": ["Expected","Rollover","Postponed"],
-    "Expected": ["Won","Lost","Postponed"],
-    "Postponed": ["Rollover","Won","Lost"],
-    "Rollover": ["Won","Lost"], 
+    "Qualified": ["CCL","Postponed", "Rollover"],
+    "CCL": ["Expected", "Rollover","Postponed"],
+    "Expected": ["Won", "Lost", "Postponed"],
+    "Postponed": ["Rollover","Won", "Lost"],
+    "Rollover": ["Won", "Lost"], 
     "Won": [],
     "Lost": []
   };
 
+  let score = 0;
+
+  function updateScore(points) {
+    score += points;
+    document.getElementById("scoreBoard").textContent = "Score: " + score;
+
+    if (score >= 30) {
+      document.getElementById("gameWon").style.display = "flex";
+    }
+  }
+
+  // Create a deal card
   const deal = document.createElement("div");
   deal.className = "deal";
   deal.textContent = "Sample Deal";
@@ -159,13 +185,15 @@
       const targetStage = stage.id;
       if (rules[fromStage].includes(targetStage)) {
         stage.appendChild(dragged);
+        updateScore(10);
 
-        // ✅ Show success message
-        const msg = document.getElementById("successMsg");
-        msg.style.display = "block";
-        setTimeout(() => msg.style.display = "none", 2000);
+        // 🎉 Small celebration for correct move
+        const celebration = document.getElementById("moveCelebration");
+        celebration.style.display = "flex";
+        setTimeout(() => celebration.style.display = "none", 2000);
 
       } else {
+        // ❌ Wrong move
         document.getElementById("gameOver").style.display = "flex";
       }
       dragged = null;
