@@ -4,109 +4,30 @@
   <meta charset="UTF-8">
   <title>Deal Stage Trainer</title>
   <style>
-    body { 
-      font-family: "Segoe UI", Roboto, Arial, sans-serif; 
-      background: #f5f8fa; 
-      margin: 20px; 
-      color: #33475b;
-    }
-    h2 {
-      text-align: center;
-      color: #33475b;
-      margin-bottom: 10px;
-    }
-    #scoreBoard {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #0091ae;
-    }
-    .board { 
-      display: flex; 
-      gap: 15px; 
-      overflow-x: auto; 
-      padding: 10px;
-    }
-    .stage { 
-      flex: 1; 
-      background: #fff; 
-      padding: 15px; 
-      border-radius: 8px; 
-      min-height: 300px; 
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      display: flex; 
-      flex-direction: column;
-      transition: transform 0.2s ease;
-    }
-    .stage:hover { transform: scale(1.02); }
-    .stage h3 { 
-      text-align: center; 
-      font-size: 14px; 
-      margin-bottom: 10px;
-      color: #0091ae;
-      font-weight: 600;
-      border-bottom: 1px solid #e5e7eb;
-      padding-bottom: 5px;
-    }
-    .deal { 
-      padding: 10px; 
-      margin: 8px 0; 
-      background: #ff7a59; 
-      color: white; 
-      cursor: grab; 
-      border-radius: 6px; 
-      font-size: 14px; 
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-      transition: transform 0.2s ease, background 0.2s ease;
-    }
-    .deal:active { cursor: grabbing; }
-    .deal:hover { transform: translateY(-2px); background: #ff5c36; }
-
+    body { font-family: "Segoe UI", Roboto, Arial, sans-serif; background: #f5f8fa; margin: 20px; color: #33475b; }
+    h2 { text-align: center; color: #33475b; margin-bottom: 10px; }
+    #scenarioBox { text-align: center; font-size: 16px; margin: 15px auto; padding: 10px; background: #fff; border-radius: 6px; width: 80%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    #scoreBoard { text-align: center; margin-bottom: 20px; font-size: 18px; font-weight: bold; color: #0091ae; }
+    .board { display: flex; gap: 15px; overflow-x: auto; padding: 10px; }
+    .stage { flex: 1; background: #fff; padding: 15px; border-radius: 8px; min-height: 300px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+    .stage h3 { text-align: center; font-size: 14px; margin-bottom: 10px; color: #0091ae; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; }
+    .deal { padding: 10px; margin: 8px 0; background: #ff7a59; color: white; cursor: grab; border-radius: 6px; font-size: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
     /* Overlays */
-    #moveCelebration, #gameWon, #gameOver {
-      display: none;
-      position: fixed;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      z-index: 50;
-    }
-
-    /* ✅ Fix: correct move GIF bottom center */
-    #moveCelebration {
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: auto; height: auto;
-    }
-
     #gameWon, #gameOver {
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85);
-      color: white;
-      font-size: 24px;
-      text-align: center;
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      align-items: center; justify-content: center; flex-direction: column;
+      background: rgba(0,0,0,0.85); color: white; font-size: 24px; text-align: center; z-index: 50;
     }
     #gameWon button, #gameOver button {
-      margin-top: 20px;
-      padding: 10px 25px;
-      border: none;
-      border-radius: 6px;
-      background: #ff7a59;
-      color: white;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background 0.2s ease;
+      margin-top: 20px; padding: 10px 25px; border: none; border-radius: 6px; background: #ff7a59; color: white; cursor: pointer;
     }
-    #gameWon button:hover, #gameOver button:hover { background:#ff5c36; }
   </style>
 </head>
 <body>
 
 <h2>HubSpot Deal Stage Trainer</h2>
-<div id="scoreBoard">Score: 0</div>
+<div id="scoreBoard">Scenario 1 of 5</div>
+<div id="scenarioBox">Loading scenario...</div>
 
 <div class="board" id="board">
   <div class="stage" id="Qualified"><h3>Qualified Client</h3></div>
@@ -118,87 +39,98 @@
   <div class="stage" id="Lost"><h3>Deal Lost</h3></div>
 </div>
 
-<!-- Celebration for correct move -->
-<div id="moveCelebration">
-  <img src="https://i.pinimg.com/originals/93/9c/c5/939cc5c66b5cbd1061874f2db44d561d.gif" 
-       alt="Good Job" width="150">
-</div>
-
-<!-- Game Won screen -->
+<!-- Game Won -->
 <div id="gameWon">
-  <p>🎉 Congratulations – You Won!</p>
-  <img src="https://i.pinimg.com/originals/0b/91/fc/0b91fc26dc66e8854c0d1b29315cdc44.gif" 
-       alt="Win" width="300">
+  <p>🎉 You completed all scenarios – Great Job!</p>
+  <img src="https://i.pinimg.com/originals/0b/91/fc/0b91fc26dc66e8854c0d1b29315cdc44.gif" width="300">
   <button onclick="location.reload()">Play Again</button>
 </div>
 
-<!-- Game Over screen -->
+<!-- Game Over -->
 <div id="gameOver">
-  <p>❌ Invalid Move – Game Over!</p>
-  <img src="https://i.pinimg.com/originals/6a/8f/8b/6a8f8b677fec23b7321b6dcf2be8e62e.gif" 
-       alt="Game Over" width="300">
+  <p>❌ Wrong move – Game Over!</p>
+  <img src="https://i.pinimg.com/originals/6a/8f/8b/6a8f8b677fec23b7321b6dcf2be8e62e.gif" width="300">
   <button onclick="location.reload()">Try Again</button>
 </div>
 
 <script>
-  // Deal movement rules
-  const rules = {
-    "Qualified": ["CCL","Postponed", "Rollover"],
-    "CCL": ["Expected", "Rollover","Postponed"],
-    "Expected": ["Won", "Lost", "Postponed"],
-    "Postponed": ["Rollover","Won", "Lost"],
-    "Rollover": ["Won", "Lost"], 
-    "Won": [],
-    "Lost": []
-  };
-
-  let score = 0;
-
-  function updateScore(points) {
-    score += points;
-    document.getElementById("scoreBoard").textContent = "Score: " + score;
-
-    if (score >= 30) {
-      document.getElementById("gameWon").style.display = "flex";
-    }
+const scenarios = [
+  {
+    text: "The client is qualified and ready to move ahead. They only need the CCL sent and are expected to buy this month.",
+    path: ["Qualified", "CCL", "Expected"]
+  },
+  {
+    text: "The client was qualified but requested to delay the purchase to next month. After the delay, they requested quote and are now ready to proceed with payment.",
+    path: ["Qualified", "Rollover", "CCL", "Expected", "Won"]
+  },
+  {
+    text: "The client was qualified, the CCL was sent, and it looked like an expected sale. But later they informed they no longer want to continue.",
+    path: ["Qualified", "CCL", "Expected", "Lost"]
+  },
+  {
+    text: "The client asked to delay after being qualified. After postponement, they eventually dropped out and the deal was lost.",
+    path: ["Qualified", "Postponed", "Lost"]
+  },
+  {
+    text: "The client was already in rollover from last month. They asked for contract and seemed promising, they finally closed successfully.",
+    path: ["Rollover", "CCL", "Expected", "Won"]
   }
+];
 
-  // Create a deal card
+let currentScenario = 0;
+let currentStep = 0;
+let dragged = null;
+
+// Load scenario
+function loadScenario(i) {
+  document.getElementById("scenarioBox").textContent = scenarios[i].text;
+  document.getElementById("scoreBoard").textContent = `Scenario ${i+1} of ${scenarios.length}`;
+  clearStages();
+  // Place deal at start
   const deal = document.createElement("div");
   deal.className = "deal";
-  deal.textContent = "Sample Deal";
+  deal.textContent = "Deal Card";
   deal.draggable = true;
-  document.getElementById("Qualified").appendChild(deal);
-
-  let dragged = null, fromStage = null;
+  document.getElementById(scenarios[i].path[0]).appendChild(deal);
 
   deal.addEventListener("dragstart", e => {
     dragged = e.target;
-    fromStage = e.target.parentNode.id;
   });
+  currentStep = 0;
+}
 
-  document.querySelectorAll(".stage").forEach(stage => {
-    stage.addEventListener("dragover", e => e.preventDefault());
+// Clear all deals
+function clearStages() {
+  document.querySelectorAll(".stage").forEach(stage => stage.innerHTML = "<h3>"+stage.querySelector("h3").textContent+"</h3>");
+}
 
-    stage.addEventListener("drop", e => {
-      e.preventDefault();
-      const targetStage = stage.id;
-      if (rules[fromStage].includes(targetStage)) {
-        stage.appendChild(dragged);
-        updateScore(10);
-
-        // 🎉 Small celebration for correct move
-        const celebration = document.getElementById("moveCelebration");
-        celebration.style.display = "flex";
-        setTimeout(() => celebration.style.display = "none", 2000);
-
-      } else {
-        // ❌ Wrong move
-        document.getElementById("gameOver").style.display = "flex";
+// Setup drop
+document.querySelectorAll(".stage").forEach(stage => {
+  stage.addEventListener("dragover", e => e.preventDefault());
+  stage.addEventListener("drop", e => {
+    e.preventDefault();
+    if (!dragged) return;
+    const targetId = stage.id;
+    const path = scenarios[currentScenario].path;
+    if (path[currentStep+1] === targetId) {
+      stage.appendChild(dragged);
+      currentStep++;
+      if (currentStep === path.length-1) {
+        // Finished this scenario
+        currentScenario++;
+        if (currentScenario < scenarios.length) {
+          setTimeout(()=>loadScenario(currentScenario), 1000);
+        } else {
+          document.getElementById("gameWon").style.display = "flex";
+        }
       }
-      dragged = null;
-    });
+    } else {
+      document.getElementById("gameOver").style.display = "flex";
+    }
   });
+});
+
+loadScenario(0);
 </script>
 </body>
 </html>
